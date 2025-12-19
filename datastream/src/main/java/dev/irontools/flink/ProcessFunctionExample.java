@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.List;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Example demonstrating KeyedProcessFunction for implementing custom windowed aggregations.
@@ -34,14 +36,15 @@ public class ProcessFunctionExample {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        List<Order> orders = OrderGenerator.generateOrders(20);
+        // Generate 100 orders with pauses: 10 orders per batch, 5-second delay between batches
+        Iterable<Order> orders = OrderGenerator.generateOrdersWithDelay(100, 10, 5000);
 
-        env.fromData(orders)
+        env.fromCollection(orders.iterator(), Order.class)
             // Assign timestamps and watermarks for event time processing
             .assignTimestampsAndWatermarks(
                 WatermarkStrategy
-                    .<Order>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-                    .withTimestampAssigner((order, timestamp) -> System.currentTimeMillis())
+                    .<Order>forBoundedOutOfOrderness(Duration.ofSeconds(5))
+                    .withTimestampAssigner((order, timestamp) -> order.getTimestamp())
             )
             .keyBy(Order::getCategory)
             .process(new WindowedAggregationFunction())
@@ -133,8 +136,10 @@ public class ProcessFunctionExample {
 
             LOG.info(
                 "[{}] Added order: ${} | Window total: ${} ({} orders)",
-                ctx.getCurrentKey(), order.getAmount(),
-                windowSumState.value(), windowCountState.value()
+                ctx.getCurrentKey(),
+                String.format("%.2f", order.getAmount()),
+                String.format("%.2f", windowSumState.value()),
+                windowCountState.value()
             );
         }
 
@@ -183,7 +188,7 @@ public class ProcessFunctionExample {
 
                 LOG.info(
                     "[{}] Emitting window result: [{}, {}) | Total: ${} | Count: {}",
-                    category, windowStart, windowEnd, sum, count
+                    category, windowStart, windowEnd, String.format("%.2f", sum), count
                 );
 
                 out.collect(result);
@@ -209,6 +214,9 @@ public class ProcessFunctionExample {
     }
 
     public static class WindowResult {
+        private static final DateTimeFormatter TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
+
         private final String category;
         private final long windowStart;
         private final long windowEnd;
@@ -224,11 +232,15 @@ public class ProcessFunctionExample {
             this.orderCount = orderCount;
         }
 
+        private String formatTime(long timestamp) {
+            return TIME_FORMATTER.format(Instant.ofEpochMilli(timestamp));
+        }
+
         @Override
         public String toString() {
             return String.format(
-                "WindowResult{category='%s', window=[%d, %d), total=$%.2f, count=%d}",
-                category, windowStart, windowEnd, totalAmount, orderCount
+                "WindowResult{category='%s', window=[%s, %s), total=$%.2f, count=%d}",
+                category, formatTime(windowStart), formatTime(windowEnd), totalAmount, orderCount
             );
         }
     }

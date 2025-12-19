@@ -8,16 +8,18 @@ public class Order {
     private String category;
     private Double amount;
     private String productName;
+    private Long timestamp;
 
     public Order() {
     }
 
-    public Order(String orderId, String customerName, String category, Double amount, String productName) {
+    public Order(String orderId, String customerName, String category, Double amount, String productName, Long timestamp) {
         this.orderId = orderId;
         this.customerName = customerName;
         this.category = category;
         this.amount = amount;
         this.productName = productName;
+        this.timestamp = timestamp;
     }
 
     public String getOrderId() {
@@ -60,6 +62,14 @@ public class Order {
         this.productName = productName;
     }
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -69,12 +79,13 @@ public class Order {
                 Objects.equals(customerName, order.customerName) &&
                 Objects.equals(category, order.category) &&
                 Objects.equals(amount, order.amount) &&
-                Objects.equals(productName, order.productName);
+                Objects.equals(productName, order.productName) &&
+                Objects.equals(timestamp, order.timestamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, customerName, category, amount, productName);
+        return Objects.hash(orderId, customerName, category, amount, productName, timestamp);
     }
 
     @Override
@@ -85,6 +96,7 @@ public class Order {
                 ", category='" + category + '\'' +
                 ", amount=" + amount +
                 ", productName='" + productName + '\'' +
+                ", timestamp=" + timestamp +
                 '}';
     }
 }
