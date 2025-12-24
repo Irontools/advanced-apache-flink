@@ -11,8 +11,10 @@
     <name>Advanced Apache Flink</name>
 
     <modules>
+        <module>common</module>
         <module>overview</module>
         <module>datastream</module>
+        <module>table</module>
     </modules>
 
     <properties>
