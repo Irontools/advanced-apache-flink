@@ -44,6 +44,8 @@ public class SerializableExample {
         PriceCalculator calculator = new PriceCalculator(0.08, "US-CA");
 
         // This works because PriceCalculator implements Serializable
+        // Another approach: create a RichMapFunction (or ProcessFunction) and save PriceCalculator
+        // as a transient field initialized in the open() method.
         env.fromData(orders)
             .filter(order -> order.getAmount() > 50.0)
             .map(order -> {
