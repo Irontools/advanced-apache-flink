@@ -24,6 +24,22 @@ public class OrderSourceTableExample {
       )
       """);
 
+    // FOR CONNECTORS
+    //
+    // tEnv.executeSql("""
+    //   CREATE TABLE FileSink (
+    //     category STRING,
+    //     total_amount DECIMAL(10, 2)
+    //   ) WITH (
+    //     'connector' = 'filesystem',
+    //     'path' = 'file:///tmp/flink/orders_output',
+    //     'format' = 'csv',
+    //     'sink.rolling-policy.rollover-interval' = '15 sec'
+    //   )
+    // """);
+    //
+    // FOR CONNECTORS
+
     // tEnv.executeSql("""
     //   CREATE TABLE PrintSink (
     //     category STRING,
