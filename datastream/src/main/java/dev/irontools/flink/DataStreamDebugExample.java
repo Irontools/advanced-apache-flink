@@ -24,6 +24,7 @@ public class DataStreamDebugExample {
             })
             .keyBy(t -> t.f0)
             .sum("f1")
+            .uid("category-amount-sum")
             .print();
 
         env.execute("DataStream Example with Orders");
