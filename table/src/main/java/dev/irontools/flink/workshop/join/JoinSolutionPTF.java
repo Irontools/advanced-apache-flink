@@ -1,4 +1,4 @@
-package dev.irontools.flink.workshop;
+package dev.irontools.flink.workshop.join;
 
 import org.apache.flink.table.annotation.ArgumentHint;
 import org.apache.flink.table.annotation.DataTypeHint;

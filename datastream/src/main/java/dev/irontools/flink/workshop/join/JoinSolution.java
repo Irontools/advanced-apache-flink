@@ -1,4 +1,4 @@
-package dev.irontools.flink.workshop;
+package dev.irontools.flink.workshop.join;
 
 import dev.irontools.flink.Order;
 import dev.irontools.flink.OrderGenerator;
